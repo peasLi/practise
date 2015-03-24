@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>multiplication table</title>
+	<style>
+	body,html,div,table,tr,td{margin:0;padding:0;border:none;}
+	table{width:960px;margin:50px auto;padding:10px;text-align:center;background:#eee;border-radius:10px;}
+	caption{padding:10px 0;height:30px;line-height:30px;font-size:20px;font-weight:bold;}
+	td{width:80px;height:40px;border:1px solid #999;cursor:pointer;}
+	td.first{background:#FFFFCC;}
+	td.second{background:#CCFFFF;}
+	td.three{background:#FFCCCC;}
+	td.current{background:#CCCC99;}
+	</style>
+</head>
+<body>
+	<div>
+		<table id="multiplicationTable">
+			<caption>九九乘法表</caption>
+		</table>
+	</div>
+	<script>
+	;(function(){
+		var multTable=document.getElementById('multiplicationTable');
+		var str='';i
+		for (var i = 1; i <= 9; i++) {
+			str+="<tr>";
+			for (var j = 1; j<=9;j++) {
+				if(j<=i){//阶梯状乘法表，没有内容的部分不进行变色
+					var mo=(i-j)%3;
+					switch(mo){
+						case 0:
+							str+="<td class='second'>";
+							break;
+						case 1:
+							str+="<td class='first'>";
+							break;
+						default:
+							str+="<td class='three'>";
+							break;
+					}
+					str+=""+(j+" * "+i)
+				}else{
+					str+="<td>";
+				}
+				str+="</td>"
+			};
+			str+="</tr>";
+		};
+		var eventFn={
+			over:function(){//鼠标移入事件
+					addClass(this,"current");
+					if (this.val==this.innerHTML) {//点击后内容和自定义属性存的值一致
+						this.innerHTML=this.newVal
+					}else{//未点击事件的原内容保存
+						this.val=this.innerHTML;
+					};
+					this.innerHTML="?";
+				},
+			out:function(){//鼠标移出事件
+					removeClass(this,"current");
+					if (this.newVal==undefined) {//未发生点击事件时，没设置newVal属性
+						this.innerHTML=this.val
+					}else{//点击事件发生后
+						this.innerHTML=this.newVal
+					}
+					this.val=null;
+				},
+			click:function(){//鼠标点击事件
+					if(this.newVal==undefined) {this.newVal=this.val;};//用一个新的自定义属性来存储td中原有的值
+					if(this.innerHTML!=this.val){//乘法结果运算，点击后得出结果，且移入移出不再变化
+						this.innerHTML=eval(this.val);
+						this.val=this.innerHTML;
+						this.removeEventListener('mouseover',eventFn.over,false)
+						this.removeEventListener('mouseout',eventFn.out,false)
+					}else{//内容为乘法结果的情况下点击，还原为乘法表达式
+						this.innerHTML=this.newVal;
+						this.addEventListener('mouseover',eventFn.over,false)
+						this.addEventListener('mouseout',eventFn.out,false)
+					}
+					
+				}
+		}
+		multTable.innerHTML+=str;
+		var nTd=multTable.getElementsByTagName('td');
+		for (var i = 0,len=nTd.length; i < len; i++) {
+			if(nTd[i].innerHTML){
+				nTd[i].addEventListener('mouseover',eventFn.over,false);
+				nTd[i].addEventListener('mouseout',eventFn.out,false);
+				nTd[i].addEventListener('click',eventFn.click,false);
+			}
+		};
+
+	})()
+	function addClass(ele,strClass){//添加类名
+		if(ele&&ele.nodeType===1){
+			if (strClass&&typeof strClass == 'string') {
+				var reg=new RegExp("(?:^| )"+strClass+"(?: |$)","g");
+				if (!reg.test(ele.className)) {
+					ele.className+=" "+strClass;
+				};
+			}
+		}
+		return this;
+	}
+	function removeClass(ele,strClass){//删除类名
+		if(ele&&ele.nodeType===1){
+			if (strClass&&typeof strClass == 'string') {
+				var reg=new RegExp("(?:^| )"+strClass+"(?: |$)","g");
+				if (reg.test(ele.className)) {
+					ele.className=ele.className.replace(reg,"");
+				};
+			}
+		}
+		return this;
+	}
+	</script>
+</body>
+</html>
